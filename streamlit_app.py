@@ -18,7 +18,14 @@ import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
-loaded_model = pickle.load(open('https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx', 'rb'))
+def load_original_data():
+    url = 'https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx'
+    response = requests.get(url)
+    if response.status_code == 200:
+        return pd.read_csv(StringIO(response.text))
+    else:
+        st.error("Failed to load data from GitHub.")
+        return None
 
 # Creating a function for prediction
 def prediction(input_data):
