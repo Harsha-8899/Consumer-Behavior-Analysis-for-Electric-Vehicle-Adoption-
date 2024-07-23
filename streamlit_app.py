@@ -10,13 +10,12 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 def load_original_data():
-    url = 'https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx'
-    response = requests.get(url)
+    data = 'https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx'
+    response = requests.get(data)
     if response.status_code == 200:
         return pd.read_csv(StringIO(response.text))
     else:
         st.error("Failed to load data from GitHub.")
         return None
 
-st.write("https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx")
 st.write(data.head())
