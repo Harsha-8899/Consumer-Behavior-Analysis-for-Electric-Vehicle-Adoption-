@@ -28,5 +28,3 @@ def load_original_data():
         return None
 
 
-st.write("### Dataset")
-st.write(data.head())
