@@ -1,15 +1,4 @@
 import streamlit as st
-st.subheader('I am Harsha!')
-st.text('My First Streamlit Project')
-
-import numpy as np
-import pickle
-import streamlit as st  # Added import statement for Streamlit
-import warnings
-
-warnings.filterwarnings("ignore", category=UserWarning)
-
-import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +17,8 @@ st.title("Electric Vehicle Data Analysis")
 st.write("An interactive web app to analyze and visualize electric vehicle data.")
 
 # Load the data
-data = pd.read_csv('https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx')
+data = pd.read_csv('H:/Harsha/Study/Data Mining/Project/Electric_Vehicle_Population_Data.csv')
 
 # Display the data
+st.write("### Dataset")
 st.write(data.head())
