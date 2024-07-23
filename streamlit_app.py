@@ -18,5 +18,5 @@ def load_original_data():
         st.error("Failed to load data from GitHub.")
         return None
 
-st.write("url")
+st.write("https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx")
 st.write(data.head())
