@@ -1,17 +1,49 @@
-import streamlit as st
-import pandas as pd
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May  6 17:42:13 2024
+
+@author: supre
+"""
+
+
 import numpy as np
+import pickle
+import streamlit as st  # Added import statement for Streamlit
+import warnings
 
-# Title and description
-st.title("Electric Vehicle Data Analysis")
-st.write("An interactive web app to analyze and visualize electric vehicle data.")
+warnings.filterwarnings("ignore", category=UserWarning)
 
-import streamlit as st
-import pandas as pd
+loaded_model = pickle.load(open('H:\Harsha\Study\Data Mining\Project\Electric_Vehicle_Population_Data.csv', 'rb'))
 
-# Load the dataset from GitHub
-data_url = "https://github.com/Harsha-8899/Consumer-Behavior-Analysis-for-Electric-Vehicle-Adoption-/blob/main/Electric_Vehicle_Population_Data.xlsx"
-data = pd.read_csv(data_url)
+# Creating a function for prediction
+def prediction(input_data):
+    # Changing the input_data to a numpy array
+    input_data_as_numpy_array = np.asarray(input_data)
+    # Reshape the array as we are predicting for one instance
+    input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
+    # Make prediction
+    prediction = loaded_model.predict(input_data_reshaped)
+    # Display the prediction
+    if prediction[0] == 0:
+        return 'The predicted Vehicle type is Battery Electric Vehicle'
+    else:
+        return 'The predicted Vehicle type is Plug-in Hybrid Electric Vehicle'
 
-# Streamlit app title
-st.title("Electric Vehicle Data Analysis")
+def main():
+    # Giving a title
+    st.title('EV Prediction Web App')
+    Postal_code = st.text_input("Postal Code")
+    Model_year = st.text_input("Model Year")
+    Make = st.text_input("Make")
+    Model = st.text_input("Model")
+    Electric_range = st.text_input("Electric Range")
+    Base_MSRP = st.text_input("Base MSRP")
+    # Code for Prediction
+    EV_type = ''
+    # Creating a button for Prediction
+    if st.button('Electric Vehicle Type:'):
+        EV_type = prediction([Postal_code, Model_year, Make, Model, Electric_range, Base_MSRP])
+    st.success(EV_type)
+
+if __name__ == '__main__':
+    main()
