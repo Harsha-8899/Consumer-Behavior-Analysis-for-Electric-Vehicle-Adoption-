@@ -13,7 +13,7 @@ import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
-loaded_model = pickle.load(open('C:\Users\harsh\Downloads\Electric_Vehicle_Population_Data.xlsx', 'rb'))
+loaded_model = pickle.load(open(r'C:\Users\harsh\Downloads\Electric_Vehicle_Population_Data.xlsx', 'rb'))
 
 # Creating a function for prediction
 def prediction(input_data):
