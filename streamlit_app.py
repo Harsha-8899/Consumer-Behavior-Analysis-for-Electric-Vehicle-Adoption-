@@ -1,49 +1,63 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May  6 17:42:13 2024
+import streamlit as st
+import geopandas as gpd
+import pandas as pd
+import folium
+from streamlit_folium import folium_static
 
-@author: supre
-"""
+#Load fuel station locations
+fuel_locations = pd.read_csv('fuel_loc.csv')
 
+#Load Washington state county GeoJSON
+wa_geojson = 'WA_County_Boundaries.geojson'
+counties = gpd.read_file(wa_geojson)
 
-import numpy as np
-import pickle
-import streamlit as st  # Added import statement for Streamlit
-import warnings
+#Convert Timestamp column to string
+counties['EDIT_DATE'] = counties['EDIT_DATE'].astype(str)
 
-warnings.filterwarnings("ignore", category=UserWarning)
+#Create map centered at coordinates
+m = folium.Map(location=[47.5, -120], zoom_start=7, control_scale=True)
 
-loaded_model = pickle.load(open(r'C:\Users\harsh\Downloads\Electric_Vehicle_Population_Data.xlsx', 'rb'))
+#Add county boundaries
+folium.GeoJson(counties, name='county boundaries').add_to(m)
 
-# Creating a function for prediction
-def prediction(input_data):
-    # Changing the input_data to a numpy array
-    input_data_as_numpy_array = np.asarray(input_data)
-    # Reshape the array as we are predicting for one instance
-    input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-    # Make prediction
-    prediction = loaded_model.predict(input_data_reshaped)
-    # Display the prediction
-    if prediction[0] == 0:
-        return 'The predicted Vehicle type is Battery Electric Vehicle'
-    else:
-        return 'The predicted Vehicle type is Plug-in Hybrid Electric Vehicle'
+#Add county names as labels for map
+for idx, row in counties.iterrows():
+    folium.Marker(
+        location=[row['geometry'].centroid.y, row['geometry'].centroid.x],
+        popup=row['JURISDICT_NM'],
+        icon=folium.Icon(icon='map-marker', icon_color='red', prefix='fa', icon_size=(10, 10), shadow_size=(0, 0))
+    ).add_to(m)
 
-def main():
-    # Giving a title
-    st.title('EV Prediction Web App')
-    Postal_code = st.text_input("Postal Code")
-    Model_year = st.text_input("Model Year")
-    Make = st.text_input("Make")
-    Model = st.text_input("Model")
-    Electric_range = st.text_input("Electric Range")
-    Base_MSRP = st.text_input("Base MSRP")
-    # Code for Prediction
-    EV_type = ''
-    # Creating a button for Prediction
-    if st.button('Electric Vehicle Type:'):
-        EV_type = prediction([Postal_code, Model_year, Make, Model, Electric_range, Base_MSRP])
-    st.success(EV_type)
+#Put fuel station locations as markers
+for idx, fuel_row in fuel_locations.iterrows():
+    folium.Marker(
+        location=[fuel_row['Latitude'], fuel_row['Longitude']],
+        popup='Fuel Station',
+        icon=folium.Icon(icon='gas', icon_color='green', prefix='fa', icon_size=(10, 10), shadow_size=(0, 0))
+    ).add_to(m)
 
-if __name__ == '__main__':
-    main()
+#Load ARIMA predictions
+arima_preds = pd.read_csv('arima_preds_updated.csv')
+
+#Streamlit app
+st.title("Washington Map with Actual Values and ARIMA Predictions")
+st.write("Enter year and month. Jan 2017 to Aug 2023 is real values, anything afterwards is predicted up until July 2026")
+    
+#User input for year and month
+user_input_year = st.number_input("Select a Year", min_value=2017, max_value=2026, value=2023)
+user_input_month = st.number_input("Select a Month", min_value=1, max_value=12, value=8)
+
+#ARIMA prediction filtering
+filtered_data = arima_preds[
+    (arima_preds['Year'] == user_input_year) &
+    (arima_preds['Month'] == user_input_month)
+]
+
+#Display total
+if not filtered_data.empty:
+    new_bev_added = filtered_data['New BEV Added'].values[0]
+    st.write(f"Value in 'New BEV Added' for {user_input_month}/{user_input_year}: {new_bev_added}")
+else:
+    st.write(f"No data available for {user_input_month}/{user_input_year}.")
+
+folium_static(m)
